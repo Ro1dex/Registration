@@ -45,7 +45,6 @@ public class RegistrationTest {
                     .post("/api/system/users")
                     .then()
                     .statusCode(200);
-
         }
 
         @Test
