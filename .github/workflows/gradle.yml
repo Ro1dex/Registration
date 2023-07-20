@@ -19,4 +19,4 @@ jobs:
       - name: execute Jar
         run: java -jar ./artifacts/app-ibank.jar -P:profile=test &
       - name: Build with Gradle
-        run: ./gradlew test -Dselenide.headless=true
+        run: ./gradlew test --info -Dselenide.headless=true
