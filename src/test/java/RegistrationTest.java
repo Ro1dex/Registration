@@ -1,55 +1,24 @@
 import com.codeborne.selenide.SelenideElement;
 import data.GenerateUser;
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.filter.log.LogDetail;
-import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.BeforeAll;
+import data.RegistrationNewUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selectors.withText;
-import static com.codeborne.selenide.Selenide.*;
-import static io.restassured.RestAssured.given;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.open;
+import static data.RegistrationNewUser.user;
+import static data.RegistrationNewUser.userBlocked;
 
 
 public class RegistrationTest {
     static class AuthTest {
-        static GenerateUser.UserInfo user = GenerateUser.registration();
-        static GenerateUser.UserInfo userBlocked = GenerateUser.registrationBlocked();
-
-        private static final RequestSpecification requestSpec = new RequestSpecBuilder()
-                .setBaseUri("http://localhost")
-                .setPort(9999)
-                .setAccept(ContentType.JSON)
-                .setContentType(ContentType.JSON)
-                .log(LogDetail.ALL)
-                .build();
-
-        @BeforeAll
-        static void setUpAll() {
-
-            // сам запрос
-            given() // "дано"
-                    .spec(requestSpec)
-                    .body(user)
-                    .when()
-                    .post("/api/system/users")
-                    .then()
-                    .statusCode(200);
-            given()
-                    .spec(requestSpec)
-                    .body(userBlocked)
-                    .when()
-                    .post("/api/system/users")
-                    .then()
-                    .statusCode(200);
-        }
 
         @Test
         @DisplayName("Should successfully login with active registered user")
         void shouldSuccessfulLoginIfRegisteredActiveUser() {
+            RegistrationNewUser.registrationAPI();
             open("http://localhost:9999");
             SelenideElement form = $("form");
             form.$("[name=login]").setValue(user.getLogin());
@@ -62,10 +31,11 @@ public class RegistrationTest {
         @Test
         @DisplayName("Should get error message if login with not registered user")
         void shouldGetErrorIfNotRegisteredUser() {
+            RegistrationNewUser.registrationAPI();
             open("http://localhost:9999");
             SelenideElement form = $("form");
-            form.$("[name=login]").setValue(user.getLogin() + "Fu");
-            form.$("[name=password]").setValue(user.getPassword() + "Fu");
+            form.$("[name=login]").setValue(GenerateUser.generateLogin());
+            form.$("[name=password]").setValue(GenerateUser.generatePassword());
             $("button").click();
             $(withText("Неверно указан логин или пароль")).shouldBe(visible);
 
@@ -75,6 +45,7 @@ public class RegistrationTest {
         @Test
         @DisplayName("Should get error message if login with blocked registered user")
         void shouldGetErrorIfBlockedUser() {
+            RegistrationNewUser.registrationAPI();
             open("http://localhost:9999");
             SelenideElement form = $("form");
             form.$("[name=login]").setValue(userBlocked.getLogin());
@@ -87,9 +58,10 @@ public class RegistrationTest {
         @Test
         @DisplayName("Should get error message if login with wrong login")
         void shouldGetErrorIfWrongLogin() {
+            RegistrationNewUser.registrationAPI();
             open("http://localhost:9999");
             SelenideElement form = $("form");
-            form.$("[name=login]").setValue(user.getLogin() + "Fu");
+            form.$("[name=login]").setValue(GenerateUser.generateLogin());
             form.$("[name=password]").setValue(user.getPassword());
             $("button").click();
             $(withText("Неверно указан логин или пароль")).shouldBe(visible);
@@ -99,10 +71,11 @@ public class RegistrationTest {
         @Test
         @DisplayName("Should get error message if login with wrong password")
         void shouldGetErrorIfWrongPassword() {
+            RegistrationNewUser.registrationAPI();
             open("http://localhost:9999");
             SelenideElement form = $("form");
             form.$("[name=login]").setValue(user.getLogin());
-            form.$("[name=password]").setValue(user.getPassword() + "Fu");
+            form.$("[name=password]").setValue(GenerateUser.generatePassword());
             $("button").click();
             $(withText("Неверно указан логин или пароль")).shouldBe(visible);
 

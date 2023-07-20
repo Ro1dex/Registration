@@ -17,20 +17,11 @@ public class GenerateUser {
         Faker faker = new Faker();
         return faker.name().lastName() + (faker.number().digits(3));
     }
-    public static GenerateUser.UserInfo registration(){
-        String status = "active";
+    public static GenerateUser.UserInfo registration(String status){
         String login = generateLogin();
         String password = generatePassword();
         return new UserInfo(login, password, status);
     }
-    public static GenerateUser.UserInfo registrationBlocked(){
-        String status = "blocked";
-        String login = generateLogin();
-        String password = generatePassword();
-        return new UserInfo(login, password, status);
-    }
-
-
 
     @Value
     public static class UserInfo {
